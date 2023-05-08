@@ -5,8 +5,10 @@ const { CacheableResponsePlugin } = require("workbox-cacheable-response");
 const { ExpirationPlugin } = require("workbox-expiration");
 const { precacheAndRoute } = require("workbox-precaching/precacheAndRoute");
 
+// The precacheAndRoute() method takes an array of URLs to precache. The self._WB_MANIFEST is an array that contains the list of URLs to precache.
 precacheAndRoute(self.__WB_MANIFEST);
 
+// Implements page caching
 const pageCache = new CacheFirst({
   cacheName: "page-cache",
   plugins: [
@@ -19,6 +21,7 @@ const pageCache = new CacheFirst({
   ],
 });
 
+// Warm the page cache as soon as the service worker is installed
 warmStrategyCache({
   urls: ["/index.html", "/"],
   strategy: pageCache,
@@ -26,7 +29,7 @@ warmStrategyCache({
 
 registerRoute(({ request }) => request.mode === "navigate", pageCache);
 
-// TODO: Implement asset caching
+// Implements asset caching
 registerRoute(
   ({ request }) => ["style", "script", "worker"].includes(request.destination),
   new StaleWhileRevalidate({
